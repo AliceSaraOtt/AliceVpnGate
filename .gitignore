@@ -1,0 +1,25 @@
+# Data directory
+vpngate_data/
+
+# Cache
+__pycache__/
+*.pyc
+
+# Local install script
+install_loc.sh
+build_install.py
+
+# IDE and other files
+.vscode/
+.gemini/
+*.ps1
+*.bat
+
+# OS files
+.DS_Store
+
+# Temporary / Refactor scripts
+do_refactor.py
+split.py
+split_precise.py
+test_cfg.py

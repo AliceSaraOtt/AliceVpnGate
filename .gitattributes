@@ -1,0 +1,5 @@
+* text=auto
+
+# 强制 .sh 脚本使用 Linux 换行符 (LF)
+*.sh text eol=lf
+install.sh text eol=lf
