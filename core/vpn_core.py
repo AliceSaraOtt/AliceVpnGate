@@ -1230,7 +1230,7 @@ def maintain_valid_nodes(force: bool = False) -> str:
             target_country = ui_cfg.get("force_country", "")
             
             if routing_mode == "fixed_region" and target_country:
-                to_test = [n for n in current_nodes if not n.get("active") and n.get("country") == target_country and n.get("probe_status") == "not_checked"][:10]
+                to_test = [n for n in current_nodes if not n.get("active") and n.get("country") == target_country and n.get("probe_status") == "not_checked"]
             else:
                 to_test = [n for n in current_nodes if not n.get("active") and n.get("probe_status") == "not_checked"][:10]
                 
