@@ -204,8 +204,12 @@ def get_state() -> dict[str, Any]:
     state["is_connecting"] = is_connecting
     state.setdefault("api_url", API_URL)
     state.setdefault("target_valid_nodes", TARGET_VALID_NODES)
-    state.setdefault("fetch_interval_seconds", FETCH_INTERVAL_SECONDS)
-    state.setdefault("check_interval_seconds", CHECK_INTERVAL_SECONDS)
+    ui_cfg = load_ui_config()
+    fetch_interval_minutes = int(ui_cfg.get("fetch_interval_minutes", 30))
+    fetch_interval_seconds = fetch_interval_minutes * 60
+    
+    state.setdefault("fetch_interval_seconds", fetch_interval_seconds)
+    state.setdefault("check_interval_seconds", fetch_interval_seconds)
     _proxy_display = f"[{LOCAL_PROXY_HOST}]" if ":" in LOCAL_PROXY_HOST else LOCAL_PROXY_HOST
     state["local_proxy"] = f"http://{_proxy_display}:{LOCAL_PROXY_PORT}"
     state.setdefault("last_fetch_status", "not_started")
@@ -220,6 +224,7 @@ def get_state() -> dict[str, Any]:
     state["proxy_port"] = ui_cfg.get("proxy_port", 7998)
     state["routing_mode"] = ui_cfg.get("routing_mode", "auto")
     state["force_country"] = ui_cfg.get("force_country", "")
+    state["fetch_interval_minutes"] = int(ui_cfg.get("fetch_interval_minutes", 30))
     
     return state
 
@@ -1290,7 +1295,9 @@ def collector_loop() -> None:
         if not active_openvpn_running() and not success:
             sleep_time = 30
         else:
-            sleep_time = CHECK_INTERVAL_SECONDS
+            ui_cfg = load_ui_config()
+            interval_minutes = int(ui_cfg.get("fetch_interval_minutes", 30))
+            sleep_time = max(60, interval_minutes * 60)
             
         time.sleep(sleep_time)
 

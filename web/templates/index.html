@@ -955,6 +955,12 @@
             ℹ️ <strong>自动配置</strong>：全自动测试并选择最佳IP。在使用过程中，如果当前连接节点没有失效，将不再更换IP；如果当前节点失效，系统将立刻秒级自动漂移到其他最快的可用节点。
           </div>
         </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label class="form-label" for="net_fetch_interval_minutes">后台自动拉取最新节点列表的间隔时间 (分钟)</label>
+          <input type="number" id="net_fetch_interval_minutes" class="input-field" required min="1" max="1440" placeholder="30">
+          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">默认 30 分钟。数字越小拉取越频繁，但如果连接稳定，频繁拉取并无必要。</div>
+        </div>
         
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
           <button type="button" onclick="closeNetworkModal()" style="height: 40px; padding: 0 16px; font-weight: 600; border-radius: 8px; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); cursor: pointer;">取消</button>
@@ -2018,6 +2024,7 @@ function openNetworkModal() {
     $("net_port").value = state.port || 9898;
     $("net_suffix").value = state.secret_path || "";
     $("net_proxy_port").value = state.proxy_port || 7998;
+    $("net_fetch_interval_minutes").value = state.fetch_interval_minutes || 30;
   }
   
   populateRoutingCountries();
@@ -2043,6 +2050,7 @@ async function saveNetwork(e) {
   const proxyPort = parseInt($("net_proxy_port").value);
   const routingMode = $("net_routing_mode").value;
   const forceCountry = $("net_force_country").value;
+  const fetchInterval = parseInt($("net_fetch_interval_minutes").value);
   
   if (isNaN(port) || port < 1 || port > 65535) {
     errorDivEl.textContent = "网页管理端口范围必须在 1 至 65535 之间";
@@ -2074,6 +2082,12 @@ async function saveNetwork(e) {
     return;
   }
   
+  if (isNaN(fetchInterval) || fetchInterval < 1) {
+    errorDivEl.textContent = "节点拉取间隔必须是正整数";
+    errorDivEl.style.display = "block";
+    return;
+  }
+  
   submitBtn.disabled = true;
   submitBtn.textContent = "正在保存...";
   
@@ -2086,7 +2100,8 @@ async function saveNetwork(e) {
         secret_path: suffix,
         proxy_port: proxyPort,
         routing_mode: routingMode,
-        force_country: forceCountry
+        force_country: forceCountry,
+        fetch_interval_minutes: fetchInterval
       })
     });
     

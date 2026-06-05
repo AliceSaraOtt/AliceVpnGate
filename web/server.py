@@ -412,6 +412,7 @@ class Handler(BaseHTTPRequestHandler):
                 new_proxy_port = payload.get("proxy_port")
                 routing_mode = str(payload.get("routing_mode") or "auto").strip()
                 force_country = str(payload.get("force_country") or "").strip()
+                fetch_interval_minutes = payload.get("fetch_interval_minutes")
                 
                 try:
                     new_port_int = int(new_port)
@@ -441,6 +442,14 @@ class Handler(BaseHTTPRequestHandler):
                     self.send_json({"ok": False, "error": "无效的路由配置模式"}, HTTPStatus.BAD_REQUEST)
                     return
                 
+                try:
+                    fetch_interval_int = int(fetch_interval_minutes) if fetch_interval_minutes is not None else 30
+                    if fetch_interval_int < 1:
+                        raise ValueError()
+                except (TypeError, ValueError):
+                    self.send_json({"ok": False, "error": "节点拉取间隔必须是正整数"}, HTTPStatus.BAD_REQUEST)
+                    return
+                
                 ui_cfg = load_ui_config()
                 expected_port = ui_cfg.get("port", 9898)
                 expected_suffix = ui_cfg.get("secret_path", "EJsW2EeBo9lY")
@@ -451,6 +460,7 @@ class Handler(BaseHTTPRequestHandler):
                 ui_cfg["proxy_port"] = new_proxy_port_int
                 ui_cfg["routing_mode"] = routing_mode
                 ui_cfg["force_country"] = force_country
+                ui_cfg["fetch_interval_minutes"] = fetch_interval_int
                 
                 auth_file = DATA_DIR / "ui_auth.json"
                 with lock:
