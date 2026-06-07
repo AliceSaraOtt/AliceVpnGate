@@ -23,3 +23,9 @@ do_refactor.py
 split.py
 split_precise.py
 test_cfg.py
+
+check_ca.py
+check_certs.py
+fetch_aia.py
+fetch_root_yr.py
+test_openvpn.py
